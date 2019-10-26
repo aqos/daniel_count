@@ -1,0 +1,23 @@
+ion-item {
+    --border-color: rgba(0, 0, 0, 0);
+    --padding-start: 0px;
+}
+
+ion-button {
+    --border-radius: 0px !important;
+    --box-shadow: 2px;
+}
+
+ion-label {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-right: 0.5rem;
+}
+
+.circle {
+    display: inline-block;
+    background: white;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}

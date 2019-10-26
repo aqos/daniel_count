@@ -1,0 +1,24 @@
+ion-item {
+    --border-color: #ffffff;
+    --padding-start: 0px;
+}
+
+ion-button {
+    --color: #3880ff;
+}
+
+ion-label {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-right: 0.25rem;
+}
+
+ion-input,
+ion-datetime {
+    color: #ffffff;
+}
+
+.logo-container {
+    width: 125px !important;
+    height: 125px !important;
+}
