@@ -14,13 +14,13 @@
         </ion-row>
         <ion-row>
             <ion-col size="12">
-                <form>
+                <form [formGroup]="registerForm">
                     <ion-grid>
                         <ion-row>
                             <ion-col size="12">
                                 <ion-item>
                                     <ion-label position="floating" class="text-white">Nom</ion-label>
-                                    <ion-input type="text"></ion-input>
+                                    <ion-input type="text" formControlName="last_name"></ion-input>
                                 </ion-item>
                             </ion-col>
                         </ion-row>
@@ -28,7 +28,7 @@
                             <ion-col size="12">
                                 <ion-item>
                                     <ion-label position="floating" class="text-white">Prénoms</ion-label>
-                                    <ion-input type="text"></ion-input>
+                                    <ion-input type="text" formControlName="first_name"></ion-input>
                                 </ion-item>
                             </ion-col>
                         </ion-row>
@@ -36,7 +36,7 @@
                             <ion-col size="12">
                                 <ion-item>
                                     <ion-label position="floating" class="text-white">Lieu de naissance</ion-label>
-                                    <ion-input type="text"></ion-input>
+                                    <ion-input type="text" formControlName="birth_place"></ion-input>
                                 </ion-item>
                             </ion-col>
                         </ion-row>
@@ -44,7 +44,7 @@
                             <ion-col size="12">
                                 <ion-item>
                                     <ion-label position="floating" class="text-white">Date de naissance</ion-label>
-                                    <ion-datetime display-format="DD MMM YYYY "></ion-datetime>
+                                    <ion-datetime display-format="DD MMM YYYY" formControlName="birth_date"></ion-datetime>
                                 </ion-item>
                             </ion-col>
                         </ion-row>
@@ -52,7 +52,7 @@
                             <ion-col size="12">
                                 <ion-item>
                                     <ion-label position="floating" class="text-white">CNI / Passeport</ion-label>
-                                    <ion-input type="text"></ion-input>
+                                    <ion-input type="text" formControlName="piece_number"></ion-input>
                                 </ion-item>
                             </ion-col>
                         </ion-row>
@@ -60,7 +60,7 @@
                             <ion-col size="12">
                                 <ion-item>
                                     <ion-label position="floating" class="text-white">Téléphone</ion-label>
-                                    <ion-input type="text"></ion-input>
+                                    <ion-input type="text" formControlName="phone"></ion-input>
                                 </ion-item>
                             </ion-col>
                         </ion-row>
@@ -68,17 +68,17 @@
                             <ion-col size="12">
                                 <ion-item>
                                     <ion-label position="floating" class="text-white">Adresse E-mail</ion-label>
-                                    <ion-input type="text"></ion-input>
+                                    <ion-input type="email" formControlName="email"></ion-input>
                                 </ion-item>
                             </ion-col>
                         </ion-row>
                         <ion-row>
                             <ion-col size="12">
                                 <div class="d-flex justify-content-between">
-                                    <ion-button color="light">
+                                    <ion-button color="light" [disabled]="!registerForm.valid" (click)="onRegister()">
                                         <span class="text-primary font-weight-bolder">Valider</span>
                                     </ion-button>
-                                    <ion-button color="light">
+                                    <ion-button color="light" (click)="onGoBack()">
                                         <span class="text-primary font-weight-bolder">Retour</span>
                                     </ion-button>
                                 </div>

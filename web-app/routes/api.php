@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -32,5 +30,6 @@ Route::middleware(['cors'])->group(function () {
         Route::get('department-couple/{id}/roads', 'RoadController@showByDepartmentCouple');
         Route::resource('car-category', 'CarCategoryController');
         Route::resource('count', 'CountController');
+        Route::get('count-config', 'AwesomeController@getAllTimeSlotWeatherAndDepartmentCouple');
     });
 });

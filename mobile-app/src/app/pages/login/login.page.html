@@ -14,13 +14,13 @@
         </ion-row>
         <ion-row>
             <ion-col size="12">
-                <form>
+                <form [formGroup]="loginForm">
                     <ion-grid>
                         <ion-row>
                             <ion-col size="12">
                                 <ion-item>
                                     <ion-label class="text-white">Identification</ion-label>
-                                    <ion-input type="password" class="custom-input"></ion-input>
+                                    <ion-input type="text" class="custom-input" formControlName="name"></ion-input>
                                 </ion-item>
                             </ion-col>
                         </ion-row>
@@ -28,14 +28,14 @@
                             <ion-col size="12">
                                 <ion-item>
                                     <ion-label class="text-white">Mot de passe</ion-label>
-                                    <ion-input type="password" class="custom-input"></ion-input>
+                                    <ion-input type="password" class="custom-input" formControlName="password"></ion-input>
                                 </ion-item>
                             </ion-col>
                         </ion-row>
                         <ion-row>
                             <ion-col size="12">
                                 <div class="d-flex justify-content-end">
-                                    <ion-button color="light">
+                                    <ion-button color="light" (click)="onLogin()" [disabled]="!loginForm.valid">
                                         <span class="text-primary">Valider</span>
                                     </ion-button>
                                 </div>
@@ -47,7 +47,7 @@
         </ion-row>
         <ion-row>
             <ion-col size="12">
-                <h5 class="text-white">
+                <h5 class="text-white" (click)="onRegister()">
                     <span class="circle"></span> S'inscrire
                 </h5>
             </ion-col>

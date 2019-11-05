@@ -22,7 +22,10 @@ class DepartmentCoupleController extends Controller
      */
     public function index()
     {
-        return response()->json(['data' => $this->departmentCoupleRepository->getAll()]);
+        return response()->json([
+            'status' => 'SUCCESS',
+            'department_couples' => $this->departmentCoupleRepository->getAll()
+        ]);
     }
 
     /**
@@ -54,7 +57,10 @@ class DepartmentCoupleController extends Controller
      */
     public function show($id)
     {
-        return response()->json(['data' => $this->departmentCoupleRepository->getById($id)]);
+        return response()->json([
+            'status' => 'SUCCESS',
+            'department_couple' => $this->departmentCoupleRepository->getById($id)
+        ]);
     }
 
     /**

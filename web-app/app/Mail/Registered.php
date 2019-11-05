@@ -12,16 +12,17 @@ class Registered extends Mailable
 {
     use Queueable, SerializesModels;
 
-    protected $user;
+    protected $username, $password;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(User $user)
+    public function __construct(string $username, string $password)
     {
-        $this->user = $user;
+        $this->username = $username;
+        $this->password = $password;
     }
 
     /**
@@ -31,9 +32,9 @@ class Registered extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.registered')
-            ->with([
-                'name' => $this->user->name,
-                'password' => $this->user->price,
-            ]);    }
+        return $this->view('emails.registered')->with([
+            'name' => $this->username,
+            'password' => $this->password,
+        ]);
+    }
 }

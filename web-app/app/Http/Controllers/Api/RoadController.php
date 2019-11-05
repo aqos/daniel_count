@@ -21,7 +21,10 @@ class RoadController extends Controller
      */
     public function index()
     {
-        return response()->json(['data' => $this->roadRepository->getAll()]);
+        return response()->json([
+            'status' => 'SUCCESS',
+            'roads' => $this->roadRepository->getAll()
+        ]);
     }
 
     /**
@@ -53,7 +56,10 @@ class RoadController extends Controller
      */
     public function show($id)
     {
-        return response()->json(['data' => $this->roadRepository->getById($id)]);
+        return response()->json([
+            'status' => 'SUCCESS',
+            'road' => $this->roadRepository->getById($id)
+        ]);
     }
 
     /**
@@ -64,7 +70,10 @@ class RoadController extends Controller
      */
     public function showByDepartmentCouple($id)
     {
-        return response()->json(['data' => $this->roadRepository->getByDepartmentCoupleId($id)]);
+        return response()->json([
+            'status' => 'SUCCESS',
+            'roads' => $this->roadRepository->getByDepartmentCoupleId($id)
+        ]);
     }
 
     /**

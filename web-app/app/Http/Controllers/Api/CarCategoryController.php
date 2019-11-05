@@ -22,7 +22,10 @@ class CarCategoryController extends Controller
      */
     public function index()
     {
-        return response()->json(['data' => $this->carCategoryRepository->getAll()]);
+        return response()->json([
+            'status' => 'SUCCESS',
+            'car_categories' => $this->carCategoryRepository->getAll()
+        ]);
     }
 
     /**
@@ -54,7 +57,10 @@ class CarCategoryController extends Controller
      */
     public function show($id)
     {
-        return response()->json(['data' => $this->carCategoryRepository->getById($id)]);
+        return response()->json([
+            'status' => 'SUCCESS',
+            'car_category' => $this->carCategoryRepository->getById($id)
+        ]);
     }
 
     /**

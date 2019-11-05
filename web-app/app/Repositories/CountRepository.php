@@ -19,7 +19,7 @@ class CountRepository extends ResourceRepository
         foreach ($inputs as $input) {
             $this->model->create($input);
         }
-        return count($success) == count($inputs) ? 'Success' : 'Failure';
+        return count($success) == count($inputs) ? 'SUCCESS' : 'FAILURE';
     }
 
     public function groupByDay($day=null)

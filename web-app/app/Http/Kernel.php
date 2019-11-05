@@ -38,6 +38,7 @@ class Kernel extends HttpKernel
         ],
 
         'api' => [
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             'throttle:60,1',
             'bindings',
             \Barryvdh\Cors\HandleCors::class,

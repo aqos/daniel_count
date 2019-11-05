@@ -1,27 +1,33 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { CountConfigResolverService } from './services/count-config-resolver.service';
+import { CountResolverService } from './services/count-resolver.service';
 
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: 'tabs',
     pathMatch: 'full'
   },
   {
-    path: 'home',
-    loadChildren: () => import('./home/home.module').then(m => m.HomePageModule)
-  },
-  {
-    path: 'list',
-    loadChildren: () => import('./list/list.module').then(m => m.ListPageModule)
+    path: 'tabs',
+    loadChildren: () => import('./pages/tabs/tabs.module').then(m => m.TabsPageModule)
   },
   { path: 'login', loadChildren: './pages/login/login.module#LoginPageModule' },
   { path: 'register', loadChildren: './pages/register/register.module#RegisterPageModule' },
   { path: 'register-success', loadChildren: './pages/register-success/register-success.module#RegisterSuccessPageModule' },
-  { path: 'count-before', loadChildren: './pages/count-before/count-before.module#CountBeforePageModule' },
-  { path: 'count-config', loadChildren: './pages/count-config/count-config.module#CountConfigPageModule' },
-  { path: 'count', loadChildren: './pages/count/count.module#CountPageModule' },
-  { path: 'chart', loadChildren: './pages/chart/chart.module#ChartPageModule' },
+  { path: 'count-config', loadChildren: './pages/count-config/count-config.module#CountConfigPageModule',
+    resolve: {
+      data: CountConfigResolverService
+    }
+  },
+  { path: 'count', loadChildren: './pages/count/count.module#CountPageModule',
+    resolve: {
+      data: CountResolverService
+    }
+  },
+  {
+    path: 'count-success', loadChildren: './pages/count-success/count-success.module#CountSuccessPageModule'},
 ];
 
 @NgModule({

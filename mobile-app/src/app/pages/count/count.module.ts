@@ -4,13 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { Routes, RouterModule } from '@angular/router';
 
 import { IonicModule } from '@ionic/angular';
-
+import { AuthGuardService as AuthGuard } from '../../services/auth-guard.service';
 import { CountPage } from './count.page';
 
 const routes: Routes = [
   {
     path: '',
-    component: CountPage
+    component: CountPage,
+    canActivate: [AuthGuard]
   }
 ];
 

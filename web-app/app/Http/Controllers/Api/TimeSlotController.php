@@ -21,7 +21,10 @@ class TimeSlotController extends Controller
      */
     public function index()
     {
-        return response()->json(['data' => $this->timeSlotRepository->getAll()]);
+        return response()->json([
+            'status' => 'SUCCESS',
+            'times_slots' => $this->timeSlotRepository->getAll()
+        ]);
     }
 
     /**

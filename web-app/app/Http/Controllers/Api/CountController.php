@@ -13,6 +13,7 @@ class CountController extends Controller
     public function __construct(CountRepository $countRepository)
     {
         $this->countRepository = $countRepository;
+        $this->middleware('auth:api', ['only' => 'store']);
     }
     /**
      * Display a listing of the resource.
@@ -21,7 +22,10 @@ class CountController extends Controller
      */
     public function index()
     {
-        return response()->json(['data' => $this->countRepository->getAll()]);
+        return response()->json([
+            'status' => 'SUCCESS',
+            'counts' => $this->countRepository->groupByDay()
+        ]);
     }
 
     /**
@@ -42,7 +46,10 @@ class CountController extends Controller
      */
     public function store(Request $request)
     {
-        return response()->json(['message' => $this->countRepository->store($request->data)]);
+        return response()->json([
+            'status' => $this->countRepository->store($request->data),
+            'message' => 'Comptage enregistré avec succès !'
+        ]);
     }
 
     /**

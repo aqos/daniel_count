@@ -38,15 +38,14 @@
         </ion-row>
         <ion-row>
             <ion-col size="12">
-                <form>
+                <form [formGroup]="countForm">
                     <ion-grid>
                         <ion-row>
                             <ion-col size="12">
                                 <ion-item>
                                     <ion-label position="floating">Temps</ion-label>
-                                    <ion-select placeholder="Sélectionnez un">
-                                        <ion-select-option value="f">Female</ion-select-option>
-                                        <ion-select-option value="m">Male</ion-select-option>
+                                    <ion-select formControlName="weather_id" placeholder="Sélectionnez en un">
+                                        <ion-select-option *ngFor="let weather of weathers" [value]="weather.id">{{ weather.name }}</ion-select-option>
                                     </ion-select>
                                 </ion-item>
                             </ion-col>
@@ -55,9 +54,8 @@
                             <ion-col size="12">
                                 <ion-item>
                                     <ion-label position="floating">Tranche horaire</ion-label>
-                                    <ion-select placeholder="Sélectionnez une">
-                                        <ion-select-option value="f">Female</ion-select-option>
-                                        <ion-select-option value="m">Male</ion-select-option>
+                                    <ion-select formControlName="time_slot_id" placeholder="Sélectionnez en une">
+                                        <ion-select-option *ngFor="let timeSlot of timeSlots" [value]="timeSlot.id">{{ timeSlot.time_slot }}</ion-select-option>
                                     </ion-select>
                                 </ion-item>
                             </ion-col>
@@ -66,20 +64,19 @@
                             <ion-col size="12">
                                 <ion-item>
                                     <ion-label position="floating">Département</ion-label>
-                                    <ion-select placeholder="Sélectionnez un">
-                                        <ion-select-option value="f">Female</ion-select-option>
-                                        <ion-select-option value="m">Male</ion-select-option>
+                                    <ion-select (ionChange)="fetchRoads()" formControlName="department_couple_id" placeholder="Sélectionnez en un">
+                                        <ion-select-option *ngFor="let departmentCouple of departmentCouples" [value]="departmentCouple.id">{{ departmentCouple.name }}</ion-select-option>
                                     </ion-select>
                                 </ion-item>
                             </ion-col>
                         </ion-row>
-                        <ion-row>
+                        <ion-row *ngIf="departmentCoupleChoosed">
                             <ion-col size="12">
                                 <ion-item>
                                     <ion-label position="floating">Axe routier</ion-label>
-                                    <ion-select placeholder="Sélectionnez un">
-                                        <ion-select-option value="f">Female</ion-select-option>
-                                        <ion-select-option value="m">Male</ion-select-option>
+                                    <ion-select *ngIf="roadsLoaded" formControlName="road_id" placeholder="Sélectionnez en un">
+                                        <ion-select-option *ngFor="let road of roads" [value]="road.id">
+                                            {{ road.section_code }}</ion-select-option>
                                     </ion-select>
                                 </ion-item>
                             </ion-col>
@@ -87,7 +84,7 @@
                         <ion-row class="mt-3">
                             <ion-col size="12">
                                 <div class="d-flex justify-content-end">
-                                    <ion-button color="light">
+                                    <ion-button color="light" [disabled]="!countForm.valid" (click)="onCount()">
                                         <span class="text-primary font-weight-bolder">Compter</span>
                                     </ion-button>
                                 </div>

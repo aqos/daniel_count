@@ -17,6 +17,12 @@ class UserRepository extends ResourceRepository {
 
     public function getLastIndex()
     {
-        return $this->getAll()->last()->id;
+        $last = $this->getAll()->last();
+        return is_null($last) ? 0 : $last->id;
+    }
+
+    public function getWhere($column, $value)
+    {
+        return $this->model->where($column, '=', $value)->first();
     }
 }

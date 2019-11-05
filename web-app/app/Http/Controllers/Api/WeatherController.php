@@ -21,7 +21,10 @@ class WeatherController extends Controller
      */
     public function index()
     {
-        return response()->json(['data' => $this->weatherRepository->getAll()]);
+        return response()->json([
+            'status' => 'SUCCESS',
+            'weathers' => $this->weatherRepository->getAll()
+        ]);
     }
 
     /**

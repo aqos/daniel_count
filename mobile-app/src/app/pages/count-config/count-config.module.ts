@@ -1,16 +1,17 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Routes, RouterModule } from '@angular/router';
 
 import { IonicModule } from '@ionic/angular';
-
+import { AuthGuardService as AuthGuard } from '../../services/auth-guard.service';
 import { CountConfigPage } from './count-config.page';
 
 const routes: Routes = [
   {
     path: '',
-    component: CountConfigPage
+    component: CountConfigPage,
+    canActivate: [AuthGuard]
   }
 ];
 
@@ -19,7 +20,8 @@ const routes: Routes = [
     CommonModule,
     FormsModule,
     IonicModule,
-    RouterModule.forChild(routes)
+    RouterModule.forChild(routes),
+    ReactiveFormsModule
   ],
   declarations: [CountConfigPage]
 })

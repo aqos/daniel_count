@@ -3,22 +3,29 @@
 namespace App\Http\Controllers\Api;
 
 use App\Mail\Registered as AppRegistered;
+use App\Providers\UtilsProvider;
 use App\Repositories\PersonRepository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    protected $userRepository, $personRepository;
+    protected $userRepository, $personRepository, $utilsProvider;
 
-    public function __construct(UserRepository $userRepository, PersonRepository $personRepository)
-    {
+    public function __construct(
+        UserRepository $userRepository, 
+        PersonRepository $personRepository, 
+        UtilsProvider $utilsProvider
+    ) {
         $this->userRepository = $userRepository;
         $this->personRepository = $personRepository;
+        $this->utilsProvider = $utilsProvider;
     }
 
     /**
@@ -32,9 +39,8 @@ class AuthController extends Controller
     */
     public function register(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'email' => 'required|string|email|unique:users',
-            'password' => 'required|string',
             'last_name' => 'required|string', 
             'first_name' => 'required|string', 
             'birth_place' => 'required|string',
@@ -43,10 +49,18 @@ class AuthController extends Controller
             'phone' => 'required|string',
         ]);
 
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'FAILURE',
+                'errors'  => $validator->errors()
+            ], 422);
+        }
+        $username = $this->utilsProvider->generateRandomString(7) . ($this->userRepository->getLastIndex() + 1); 
+        $password = $this->utilsProvider->generateRandomString(8);
         $user = $this->userRepository->store([
-            'name' => $this->generateRandomString(7) . ($this->userRepository->getLastIndex() + 1),
+            'name' => $username,
             'email' => $request->email,
-            'password' => Hash::make($this->generateRandomString(8)),
+            'password' => Hash::make($password),
             'email_verified_at' => Carbon::now()
         ]);
 
@@ -60,9 +74,10 @@ class AuthController extends Controller
             'user_id' => $user->id
         ]);
 
-        Mail::to($request->email)->send(new AppRegistered($user));
+        Mail::to($request->email)->send(new AppRegistered($username, $password));
 
         return response()->json([
+            'status' => 'SUCCESS',
             'message' => 'Successfully created user!'
         ], 201);
     }
@@ -70,7 +85,7 @@ class AuthController extends Controller
     /**
      * Login user and create token
      *
-     * @param  [string] email
+     * @param  [string] name
      * @param  [string] password
      * @param  [boolean] remember_me
      * @return [string] access_token
@@ -79,31 +94,42 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string',
             'password' => 'required|string',
-            // 'remember_me' => 'boolean'
         ]);
 
-        $credentials = request(['name', 'password']);
-
-        if (!Auth::attempt($credentials))
+        if ($validator->fails()) {
             return response()->json([
+                'status' => 'FAILURE',
+                'errors'  => $validator->errors()
+            ], 422);
+        }
+
+        $user = $this->userRepository->getWhere('name', $request->name);
+        if (is_null($user)) {
+            return response()->json([
+                'status' => 'FAILURE',
+                'message' => 'Utilisateur ou mot de passe invalide !'
+            ], 404);
+        }
+        $request->merge(['email' => $user->email]);
+        $credentials = request(['email', 'password']);
+        if(!Auth::attempt($credentials))
+            return response()->json([
+                'status' => 'FAILURE',
                 'message' => 'Unauthorized'
             ], 401);
+
         $user = $request->user();
         $tokenResult = $user->createToken('Personal Access Token');
-        $token = $tokenResult->token;
-        // if ($request->remember_me)
-        //     $token->expires_at = Carbon::now()->addWeeks(1);
-        // $token->save();
-
         return response()->json([
-            'access_token' => $tokenResult->accessToken,
-            'token_type' => 'Bearer',
-            'expires_at' => Carbon::parse(
-                $tokenResult->token->expires_at
-            )->toDateTimeString()
+            'status' => 'SUCCESS',
+            'token' => [
+                'access_token' => $tokenResult->accessToken,
+                'token_type' => 'Bearer',
+                'expires_at' => Carbon::now()->timestamp + 864000
+            ],
         ]);
     }
 
@@ -116,6 +142,7 @@ class AuthController extends Controller
     {
         $request->user()->token()->revoke();
         return response()->json([
+            'status' => 'SUCCESS',
             'message' => 'Successfully logged out'
         ]);
     }
@@ -127,17 +154,9 @@ class AuthController extends Controller
      */
     public function user(Request $request)
     {
-        return response()->json($this->userRepository->getUserWithPerson($request->user()->id));
-    }
-    
-    private function generateRandomString($length = 10)
-    {
-        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $charactersLength = strlen($characters);
-        $randomString = '';
-        for ($i = 0; $i < $length; $i++) {
-            $randomString .= $characters[rand(0, $charactersLength - 1)];
-        }
-        return $randomString;
+        return response()->json([
+            'status' => 'SUCCESS',
+            'user' => $this->userRepository->getUserWithPerson($request->user()->id)
+        ]);
     }
 }
