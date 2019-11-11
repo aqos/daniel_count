@@ -5,6 +5,7 @@ import { isNull } from 'util';
 import { Injectable } from '@angular/core';
 import * as CryptoJS from 'crypto-js';
 import { environment } from 'src/environments/environment';
+import { Storage } from '@ionic/storage';
 
 export const BASE_URL = 'http://localhost:8000/api';
 export const LOGIN_URL = BASE_URL + '/auth/login';
@@ -36,21 +37,7 @@ export function handleError(error: HttpErrorResponse) {
         'Something bad happened; please try again later.');
 }
 
-export function getItemFromLocalStorage(key: string) {
-    return decryptData(localStorage.getItem(key));
-}
-
-export function setItemInLocalStorage(key: string, item: any): void {
-    localStorage.setItem(key, encryptData(item));
-}
-
-export function isValidToken() {
-    const token = getItemFromLocalStorage('token');
-    return !isNull(token) && token.expires_at > Math.floor(Date.now() / 1000);
-}
-
 export function encryptData(data) {
-
     try {
         return CryptoJS.AES.encrypt(JSON.stringify(data), environment.encryptSecretKey).toString();
     } catch (e) {
@@ -59,12 +46,11 @@ export function encryptData(data) {
 }
 
 export function decryptData(data) {
-
     try {
         const bytes = CryptoJS.AES.decrypt(data, environment.encryptSecretKey);
-        // if (bytes.toString()) {
-        //     return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-        // }
+        if (bytes.toString()) {
+            return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+        }
         return data;
     } catch (e) {
         console.log(e);
@@ -81,29 +67,56 @@ export class NotificationTools {
         private alertController: AlertController
     ) { }
 
-    async presentLoading(msg: string) {
-        const loading = await this.loadingController.create({
+    createLoading(msg: string) {
+        return this.loadingController.create({
             message: msg,
         });
-        await loading.present();
     }
 
-    async presentAlert(head: string, msg: string) {
-        const alert = await this.alertController.create({
+    createAlert(head: string, msg: string) {
+        return this.alertController.create({
             header: head,
             message: msg,
             buttons: ['OK']
         });
-
-        await alert.present();
-    }
-
-    dismissLoading() {
-        this.loadingController.dismiss();
-    }
-
-    dismissAlert() {
-        this.alertController.dismiss();
     }
 }
 
+@Injectable({
+    providedIn: 'root'
+})
+export class Utils {
+    constructor(private storage: Storage) { }
+
+    get(key: string) {
+        let data = null;
+        this.storage.get(key)
+            .then(
+                (entry) => {
+                    console.log(entry);
+                    data = entry;
+                },
+                (error) => console.error(error)
+            );
+        return data;
+    }
+
+    store(key: string, item: any): void {
+        console.log(item);
+        this.storage.set('name', item);
+    }
+
+    destroy(key: string) {
+        this.storage.remove(key).then(
+            (value) => {
+                console.log('Removed : ', value);
+            },
+            error => console.log('Error removing item from storage : ', error)
+        );
+    }
+
+    isValidToken() {
+        const token = this.get('token');
+        return !isNull(token) && token.expires_at > Math.floor(Date.now() / 1000);
+    }
+}

@@ -4,8 +4,9 @@ import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GenericResponse } from '../../models/GenericResponse';
 import { Count } from '../../models/Count';
-import { NotificationTools, getItemFromLocalStorage } from '../../models/utils';
+import { NotificationTools, Utils } from '../../models/utils';
 import { CountService } from '../../services/count.service';
+import { Platform } from '@ionic/angular';
 
 @Component({
   selector: 'app-count',
@@ -18,14 +19,21 @@ export class CountPage implements OnInit {
   counts: Count[] = [];
   timeLeft = 21600;
   interval;
+  isSmallBreakPoint: boolean;
 
   constructor(
+    private platform: Platform,
     private location: Location,
     private route: ActivatedRoute,
     private router: Router,
     private notificationTools: NotificationTools,
-    private countService: CountService
-  ) { }
+    private countService: CountService,
+    private utils: Utils
+  ) {
+    this.platform.ready().then(() => {
+      this.isSmallBreakPoint = this.platform.width() >= 576;
+    });
+  }
 
   ngOnInit() {
     this.route.data
@@ -41,7 +49,7 @@ export class CountPage implements OnInit {
   }
 
   initializeCounts() {
-    const countData = getItemFromLocalStorage('countData') as Count;
+    const countData = this.utils.get('countData');
     for (let index = 0; index < this.counts.length; index++) {
       this.counts[index] = new Count();
       this.counts[index].weather_id = countData.weather_id;
@@ -51,17 +59,17 @@ export class CountPage implements OnInit {
     }
   }
 
-  startTimer() {
-    this.interval = setInterval(() => {
+  async startTimer() {
+    this.interval = setInterval(async () => {
       if (this.timeLeft > 0) {
         this.timeLeft--;
         if ((this.timeLeft % 3600) === 0) {
-          this.notificationTools.presentAlert('Alert', '<p class="text-warning">Il vous reste 0'
+          const alert = await this.notificationTools.createAlert('Alert', '<p class="text-warning">Il vous reste 0'
             + (this.timeLeft / 3600) + ' heure(s) de comptage !</p>');
+          alert.present();
         }
       } else {
         this.timeLeft = 0;
-        this.notificationTools.presentLoading('L\'envoi des données de comptage a débuté...');
         this.onSaveCount();
       }
     }, 1000);
@@ -71,22 +79,27 @@ export class CountPage implements OnInit {
     this.location.back();
   }
 
-  onSaveCount() {
+  async onSaveCount() {
     if (this.timeLeft > 0) {
-      this.notificationTools.presentAlert('Alerte', '<p class="text-danger">Le temps imparti pour le comptage n\'est pas épuisé !</p>');
+      // tslint:disable-next-line: max-line-length
+      const alert0 = await this.notificationTools.createAlert('Alerte', '<p class="text-danger">Le temps imparti pour le comptage n\'est pas épuisé !</p>');
+      alert0.present();
       return;
     }
-    this.notificationTools.presentLoading('Envoie des données de comptage en cours...');
+    const loading = await this.notificationTools.createLoading('Envoie des données de comptage en cours...');
+    loading.present();
+    const alert = await this.notificationTools.createAlert('Information', '<p class="text-success">Comptage enregistré avec succès !</p>');
+    const alertError = await this.notificationTools.createAlert('Alerte', '<p class="text-danger">Une erreur est survenue, ' +
+      'veuillez le notifier à l\'administrateur !</p>');
     this.countService.postCounts(this.counts).subscribe(
       data => {
-        this.notificationTools.dismissLoading();
-        this.notificationTools.presentAlert('Information', '<p class="text-success">Comptage enregistré avec succès !</p>');
+        loading.dismiss();
+        alert.present();
         this.router.navigate(['/count-success']);
       },
       error => {
-        this.notificationTools.dismissLoading();
-        this.notificationTools.presentAlert('Alerte', '<p class="text-danger">Une erreur est survenue, ' +
-          'veuillez le notifier à l\'administrateur !</p>');
+        loading.dismiss();
+        alertError.present();
       }
     );
   }
@@ -112,7 +125,7 @@ export class CountPage implements OnInit {
     }
   }
 
-  getModel(index: number) {
+  getValue(index: number) {
     if (this.timeLeft > 18000 && this.timeLeft <= 21600) {
       return this.counts[index].counts[0];
     }

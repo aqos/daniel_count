@@ -5,7 +5,6 @@ import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { AuthService } from './services/auth.service';
 import { Router } from '@angular/router';
-import { getItemFromLocalStorage } from './models/utils';
 
 @Component({
   selector: 'app-root',
@@ -19,7 +18,7 @@ export class AppComponent {
     private splashScreen: SplashScreen,
     private statusBar: StatusBar,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
   ) {
     this.initializeApp();
   }

@@ -33,13 +33,11 @@
       </ion-col>
     </ion-row>
 
-    <ion-row class="mb-3">
+    <ion-row *ngIf="!isSmallBreakPoint" class="mb-3">
       <ion-col
         *ngFor="let carCategory of carCategories; let i = index"
         size="6"
-        size-sm="4"
         [offset]="i === 12 ? 3 : 0"
-        [offset-sm]="i === 12 ? 4 : 0"
       >
         <div class="d-flex flex-column bg-grey engine-container">
           <div class="logo-container">
@@ -55,11 +53,46 @@
               name="add"
               (click)="increment(i)"
             ></ion-icon>
-            <ion-input
+            <ion-label
               type="text"
               class="bg-white flex-2 custom-input"
-              [(ngModel)]="getModel(i)"
-            ></ion-input>
+            >{{ getValue(i) }}</ion-label>
+            <ion-icon
+              color="light"
+              class="flex-1"
+              slot="icon-only"
+              name="remove"
+              (click)="decrement(i)"
+            ></ion-icon>
+          </div>
+        </div>
+      </ion-col>
+    </ion-row>
+
+    <ion-row class="mb-3" *ngIf="isSmallBreakPoint">
+      <ion-col
+        *ngFor="let carCategory of carCategories; let i = index"
+        size="4"
+        [offset]="i === 12 ? 4 : 0"
+      >
+        <div class="d-flex flex-column bg-grey engine-container">
+          <div class="logo-container">
+            <img [src]="carCategory.avatar" alt="Engine" />
+          </div>
+          <div
+            class="d-flex justify-content-between align-items-center bg-primary action-container"
+          >
+            <ion-icon
+              color="light"
+              class="flex-1"
+              slot="icon-only"
+              name="add"
+              (click)="increment(i)"
+            ></ion-icon>
+            <ion-label
+              type="text"
+              class="bg-white flex-2 custom-input"
+            >{{ getValue(i) }}</ion-label>
             <ion-icon
               color="light"
               class="flex-1"

@@ -7,7 +7,7 @@ import { CountService } from '../../services/count.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { GenericResponse } from '../../models/GenericResponse';
-import { NotificationTools, setItemInLocalStorage } from '../../models/utils';
+import { NotificationTools, Utils } from '../../models/utils';
 import { Count } from '../../models/Count';
 
 @Component({
@@ -29,7 +29,8 @@ export class CountConfigPage implements OnInit {
     private router: Router,
     private formBuilder: FormBuilder,
     private notificationTools: NotificationTools,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private utils: Utils
   ) { }
 
   ngOnInit() {
@@ -64,25 +65,28 @@ export class CountConfigPage implements OnInit {
     counData.weather_id = parseInt(this.countForm.get('weather_id').value, 10);
     counData.time_slot_id = parseInt(this.countForm.get('time_slot_id').value, 10);
     counData.road_id = parseInt(this.countForm.get('road_id').value, 10);
-    setItemInLocalStorage('countData', counData);
+    this.utils.store('countData', counData);
     this.router.navigate(['/count']);
   }
 
-  fetchRoads() {
+  async fetchRoads() {
     this.departmentCoupleChoosed = false;
     this.roadsLoaded = false;
-    this.notificationTools.presentLoading('Veuillez patienter svp ! Chargement des routes du département choisi en cours...');
+    // tslint:disable-next-line: max-line-length
+    const loading = await this.notificationTools.createLoading('Veuillez patienter svp ! Chargement des routes du département choisi en cours...');
+    loading.present();
+    const alertError = await this.notificationTools.createAlert('Alerte', '<p class="text-danger">Une erreur est survenue, ' +
+      'veuillez le notifier à l\'administrateur !</p>');
     this.countService.getDepartmentCoupleRoads(parseInt(this.countForm.get('department_couple_id').value, 10)).subscribe(
       (data: GenericResponse) => {
         this.roads = data.roads;
         this.roadsLoaded = true;
         this.departmentCoupleChoosed = true;
-        this.notificationTools.dismissLoading();
+        loading.dismiss();
       },
       error => {
-        this.notificationTools.dismissLoading();
-        this.notificationTools.presentAlert('Alerte', '<p class="text-danger">Une erreur est survenue, ' +
-        'veuillez le notifier à l\'administrateur !</p>');
+        loading.dismiss();
+        alertError.present();
       }
     );
   }

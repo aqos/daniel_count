@@ -4,7 +4,7 @@ import { Login } from '../../models/LoginData';
 import { AuthService } from 'src/app/services/auth.service';
 import { GenericResponse } from '../../models/GenericResponse';
 import { Router } from '@angular/router';
-import { NotificationTools, setItemInLocalStorage } from '../../models/utils';
+import { NotificationTools, Utils } from '../../models/utils';
 
 @Component({
   selector: 'app-login',
@@ -19,6 +19,7 @@ export class LoginPage implements OnInit {
     private authService: AuthService,
     private router: Router,
     private notificationTools: NotificationTools,
+    private utils: Utils
   ) { }
 
   ngOnInit() {
@@ -32,22 +33,25 @@ export class LoginPage implements OnInit {
     });
   }
 
-  onLogin() {
+  async onLogin() {
     const data = new Login();
     data.name = this.loginForm.get('name').value;
     data.password = this.loginForm.get('password').value;
-    this.notificationTools.presentLoading('Veuillez patienter svp...');
+    const loading = await this.notificationTools.createLoading('Veuillez patienter svp...');
+    loading.present();
+    // tslint:disable-next-line: max-line-length
+    const alertError = await this.notificationTools.createAlert('Alerte', '<p class="text-danger">Identifiant ou mot de passe invalide !</p>');
     this.authService.login(data).subscribe(
       (response: GenericResponse) => {
-        setItemInLocalStorage('token', response.token);
-        setItemInLocalStorage('password', data.password);
-        this.notificationTools.dismissLoading();
+        this.utils.store('token', response.token);
+        this.utils.store('password', data.password);
+        loading.dismiss();
         this.router.navigate(['/tabs']);
       },
       error => {
-        this.notificationTools.dismissLoading();
-        console.log('Register page error: ', error);
-        this.notificationTools.presentAlert('Alerte', '<p class="text-danger">Une erreur est survenue, veuillez réessayer !</p>');
+        loading.dismiss();
+        console.log('Login page error: ', error);
+        alertError.present();
       }
     );
   }

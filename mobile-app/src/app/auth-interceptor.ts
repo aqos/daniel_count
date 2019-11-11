@@ -2,15 +2,14 @@ import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpErrorResponse
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { AuthService } from './services/auth.service';
-import { getItemFromLocalStorage, setItemInLocalStorage } from './models/utils';
-import { Token } from './models/Token';
+import { Utils } from './models/utils';
 import { Router } from '@angular/router';
 import { catchError } from 'rxjs/operators';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router, private utils: Utils) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     if (!req.headers.has('Content-Type')) {
@@ -20,10 +19,10 @@ export class AuthInterceptor implements HttpInterceptor {
     }
 
     if (this.authService.getIsAuth()) {
-      const token = getItemFromLocalStorage('token') as Token;
+      const token = this.utils.get('token');
       req = req.clone({
         setHeaders: {
-          'Authorization': `${token.token_type} ${token.access_token}`,
+          Authorization: `${token.token_type} ${token.access_token}`,
         },
       });
     }
@@ -34,7 +33,7 @@ export class AuthInterceptor implements HttpInterceptor {
           const return$ = this.authService.logout();
           if (return$ instanceof Observable) {
             return$.subscribe(data => {
-              setItemInLocalStorage('token', null);
+              this.utils.destroy('token');
               this.router.navigate(['/login']);
             });
           }

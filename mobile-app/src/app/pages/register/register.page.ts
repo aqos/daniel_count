@@ -49,17 +49,19 @@ export class RegisterPage implements OnInit {
     data.phone = this.registerForm.get('phone').value;
     data.email = this.registerForm.get('email').value;
 
-    this.notificationTools.presentLoading('Veuillez patienter svp...');
-
+    const loading = await this.notificationTools.createLoading('Veuillez patienter svp...');
+    loading.present();
+    // tslint:disable-next-line: max-line-length
+    const alertError = await this.notificationTools.createAlert('Alerte', '<p class="text-danger">Une erreur est survenue, veuillez réessayer !</p>');
     this.authService.register(data).subscribe(
       (response: GenericResponse) => {
-        this.notificationTools.dismissLoading();
+        loading.dismiss();
         this.router.navigate(['/register-success']);
       },
       error => {
-        this.notificationTools.dismissLoading();
+        loading.dismiss();
         console.log('Register page error: ', error);
-        this.notificationTools.presentAlert('Alerte', '<p class="text-danger">Une erreur est survenue, veuillez réessayer !</p>');
+        alertError.present();
       }
     );
   }

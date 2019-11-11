@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { GenericResponse } from '../models/GenericResponse';
 import { Register } from '../models/Register';
-import { REGISTER_URL, handleError, LOGIN_URL, LOGOUT_URL, GET_AUTHENTICATED_USER_URL, getItemFromLocalStorage, setItemInLocalStorage, isValidToken } from '../models/utils';
+import { REGISTER_URL, handleError, LOGIN_URL, LOGOUT_URL, GET_AUTHENTICATED_USER_URL, Utils } from '../models/utils';
 import { catchError } from 'rxjs/operators';
 import { Login } from '../models/LoginData';
 import { Token } from '../models/Token';
@@ -14,10 +14,10 @@ import { Router } from '@angular/router';
 })
 export class AuthService {
 
-  constructor(private http: HttpClient, private router: Router) { }
+  constructor(private http: HttpClient, private router: Router, private utils: Utils) { }
 
   getIsAuth() {
-    return isValidToken();
+    return this.utils.isValidToken();
   }
 
   register(data: Register): Observable<GenericResponse> {
@@ -35,7 +35,7 @@ export class AuthService {
   }
 
   logout(): Observable<GenericResponse> | number {
-    const token = getItemFromLocalStorage('token') as Token;
+    const token = this.utils.get('token');
     if (token !== null) {
       return this.http.get<GenericResponse>(LOGOUT_URL)
         .pipe(
