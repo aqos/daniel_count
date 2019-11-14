@@ -4,7 +4,7 @@ import { Login } from '../../models/LoginData';
 import { AuthService } from 'src/app/services/auth.service';
 import { GenericResponse } from '../../models/GenericResponse';
 import { Router } from '@angular/router';
-import { NotificationTools, Utils } from '../../models/utils';
+import { NotificationTools } from '../../models/utils';
 
 @Component({
   selector: 'app-login',
@@ -19,7 +19,6 @@ export class LoginPage implements OnInit {
     private authService: AuthService,
     private router: Router,
     private notificationTools: NotificationTools,
-    private utils: Utils
   ) { }
 
   ngOnInit() {
@@ -43,10 +42,21 @@ export class LoginPage implements OnInit {
     const alertError = await this.notificationTools.createAlert('Alerte', '<p class="text-danger">Identifiant ou mot de passe invalide !</p>');
     this.authService.login(data).subscribe(
       (response: GenericResponse) => {
-        this.utils.store('token', response.token);
-        this.utils.store('password', data.password);
-        loading.dismiss();
-        this.router.navigate(['/tabs']);
+        this.authService.setToken(response.token);
+        localStorage.setItem('password', data.password);
+        this.authService.user().subscribe(
+          (resp) => {
+            console.log(resp.user);
+            localStorage.setItem('user', JSON.stringify(resp.user));
+            loading.dismiss();
+            this.router.navigate(['/tabs']);
+          },
+          error => {
+            loading.dismiss();
+            console.log('Login page error: ', error);
+            alertError.present();
+          }
+        );
       },
       error => {
         loading.dismiss();

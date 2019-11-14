@@ -4,9 +4,10 @@ import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GenericResponse } from '../../models/GenericResponse';
 import { Count } from '../../models/Count';
-import { NotificationTools, Utils } from '../../models/utils';
+import { NotificationTools } from '../../models/utils';
 import { CountService } from '../../services/count.service';
 import { Platform } from '@ionic/angular';
+import { User } from '../../models/User';
 
 @Component({
   selector: 'app-count',
@@ -28,7 +29,6 @@ export class CountPage implements OnInit {
     private router: Router,
     private notificationTools: NotificationTools,
     private countService: CountService,
-    private utils: Utils
   ) {
     this.platform.ready().then(() => {
       this.isSmallBreakPoint = this.platform.width() >= 576;
@@ -49,12 +49,14 @@ export class CountPage implements OnInit {
   }
 
   initializeCounts() {
-    const countData = this.utils.get('countData');
-    for (let index = 0; index < this.counts.length; index++) {
+    const countData = JSON.parse(localStorage.getItem('countData')) as Count;
+    const user = JSON.parse(localStorage.getItem('user')) as User;
+    for (let index = 0; index < this.carCategories.length; index++) {
       this.counts[index] = new Count();
       this.counts[index].weather_id = countData.weather_id;
       this.counts[index].time_slot_id = countData.time_slot_id;
       this.counts[index].road_id = countData.road_id;
+      this.counts[index].user_id = user.id;
       this.counts[index].counts = [0, 0, 0, 0, 0, 0];
     }
   }
@@ -86,6 +88,8 @@ export class CountPage implements OnInit {
       alert0.present();
       return;
     }
+    console.log(this.counts);
+
     const loading = await this.notificationTools.createLoading('Envoie des données de comptage en cours...');
     loading.present();
     const alert = await this.notificationTools.createAlert('Information', '<p class="text-success">Comptage enregistré avec succès !</p>');
@@ -148,22 +152,34 @@ export class CountPage implements OnInit {
 
   decrement(index: number) {
     if (this.timeLeft > 18000 && this.timeLeft <= 21600) {
-      this.counts[index].counts[0]--;
+      if (this.counts[index].counts[0] > 0) {
+        this.counts[index].counts[0]--;
+      }
     }
     if (this.timeLeft > 14400 && this.timeLeft <= 18000) {
-      this.counts[index].counts[1]--;
+      if (this.counts[index].counts[1] > 0) {
+        this.counts[index].counts[1]--;
+      }
     }
     if (this.timeLeft > 10800 && this.timeLeft <= 14400) {
-      this.counts[index].counts[2]--;
+      if (this.counts[index].counts[2] > 0) {
+        this.counts[index].counts[2]--;
+      }
     }
     if (this.timeLeft > 7200 && this.timeLeft <= 10800) {
-      this.counts[index].counts[3]--;
+      if (this.counts[index].counts[3] > 0) {
+        this.counts[index].counts[3]--;
+      }
     }
     if (this.timeLeft > 3600 && this.timeLeft <= 7200) {
-      this.counts[index].counts[4]--;
+      if (this.counts[index].counts[4] > 0) {
+        this.counts[index].counts[4]--;
+      }
     }
     if (this.timeLeft > 0 && this.timeLeft <= 3600) {
-      this.counts[index].counts[5]--;
+      if (this.counts[index].counts[5] > 0) {
+        this.counts[index].counts[5]--;
+      }
     }
   }
 }

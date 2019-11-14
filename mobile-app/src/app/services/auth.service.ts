@@ -3,21 +3,37 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { GenericResponse } from '../models/GenericResponse';
 import { Register } from '../models/Register';
-import { REGISTER_URL, handleError, LOGIN_URL, LOGOUT_URL, GET_AUTHENTICATED_USER_URL, Utils } from '../models/utils';
+import { REGISTER_URL, handleError, LOGIN_URL, LOGOUT_URL, GET_AUTHENTICATED_USER_URL } from '../models/utils';
 import { catchError } from 'rxjs/operators';
 import { Login } from '../models/LoginData';
 import { Token } from '../models/Token';
-import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  constructor(private http: HttpClient, private router: Router, private utils: Utils) { }
+  constructor(private http: HttpClient) {
+  }
 
-  getIsAuth() {
-    return this.utils.isValidToken();
+  public isAuth(): boolean {
+    return this.getToken() !== null && !this.isTokenExpired(this.getToken().expires_at);
+  }
+
+  isTokenExpired(timestamp: number): boolean {
+    return Math.floor(new Date().getTime() / 1000) > timestamp;
+  }
+
+  getToken(): Token {
+    return JSON.parse(localStorage.getItem('access_token')) as Token;
+  }
+
+  setToken(token: Token) {
+    localStorage.setItem('access_token', JSON.stringify(token));
+  }
+
+  getAuthorization(): string {
+    return `${this.getToken().token_type} ${this.getToken().access_token}`;
   }
 
   register(data: Register): Observable<GenericResponse> {
@@ -34,15 +50,11 @@ export class AuthService {
       );
   }
 
-  logout(): Observable<GenericResponse> | number {
-    const token = this.utils.get('token');
-    if (token !== null) {
+  logout(): Observable<GenericResponse> {
       return this.http.get<GenericResponse>(LOGOUT_URL)
         .pipe(
           catchError(handleError)
         );
-    }
-    return -1;
   }
 
   user(): Observable<GenericResponse> {

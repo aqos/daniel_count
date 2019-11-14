@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CarCategory extends Model
 {
-    protected $fillable = ['name', 'avatar'];
+    protected $fillable = ['name', 'avatar', 'avatar_xs'];
 
     public function counts()
     {

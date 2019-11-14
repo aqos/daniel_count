@@ -47,7 +47,7 @@ class CountController extends Controller
     public function store(Request $request)
     {
         return response()->json([
-            'status' => $this->countRepository->store($request->data),
+            'status' => $this->countRepository->store($request->all()),
             'message' => 'Comptage enregistré avec succès !'
         ]);
     }

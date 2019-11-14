@@ -7,7 +7,7 @@ import { CountService } from '../../services/count.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { GenericResponse } from '../../models/GenericResponse';
-import { NotificationTools, Utils } from '../../models/utils';
+import { NotificationTools } from '../../models/utils';
 import { Count } from '../../models/Count';
 
 @Component({
@@ -30,7 +30,6 @@ export class CountConfigPage implements OnInit {
     private formBuilder: FormBuilder,
     private notificationTools: NotificationTools,
     private route: ActivatedRoute,
-    private utils: Utils
   ) { }
 
   ngOnInit() {
@@ -65,7 +64,7 @@ export class CountConfigPage implements OnInit {
     counData.weather_id = parseInt(this.countForm.get('weather_id').value, 10);
     counData.time_slot_id = parseInt(this.countForm.get('time_slot_id').value, 10);
     counData.road_id = parseInt(this.countForm.get('road_id').value, 10);
-    this.utils.store('countData', counData);
+    localStorage.setItem('countData', JSON.stringify(counData));
     this.router.navigate(['/count']);
   }
 

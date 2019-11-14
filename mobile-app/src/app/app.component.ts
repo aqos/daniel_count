@@ -27,9 +27,7 @@ export class AppComponent {
     this.platform.ready().then(() => {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
-      if (!this.authService.getIsAuth()) {
-        this.router.navigate(['/login']);
-      }
+      localStorage.setItem('token', null);
     });
   }
 }

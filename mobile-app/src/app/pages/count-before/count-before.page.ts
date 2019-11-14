@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Utils } from '../../models/utils';
+import { Storage } from '@ionic/storage';
 
 @Component({
   selector: 'app-count-before',
@@ -11,7 +11,7 @@ export class CountBeforePage implements OnInit {
   password = '';
   wrongPassword = false;
 
-  constructor(private router: Router, private utils: Utils) { }
+  constructor(private router: Router, private storage: Storage) { }
 
   ngOnInit() {
   }
@@ -20,8 +20,8 @@ export class CountBeforePage implements OnInit {
     return this.password.length >= 8;
   }
 
-  onSubmit() {
-    const goodPassword = this.utils.get('password');
+  async onSubmit() {
+    const goodPassword = localStorage.getItem('password');
     if (goodPassword !== this.password) {
       this.wrongPassword = true;
       return;

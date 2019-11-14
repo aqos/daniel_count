@@ -76,4 +76,33 @@ class UtilsProvider
             return floatval($str); // take some last chances with floatval
         }
     }
+
+    public function createCount(string $date, int $time_slot)
+    {
+        $data = [];
+        for ($i=0; $i < 13; $i++) {
+            $data = array_merge($data, [
+                [
+                    'user_id' => 1, 
+                    'road_id' => 59, 
+                    'weather_id' => random_int(1, 2), 
+                    'car_category_id' => $i+1, 
+                    'time_slot_id' => $time_slot, 
+                    'counts' => [rand(), rand(), rand(), rand(), rand(), rand()],
+                    'created_at' => $date,
+                    'updated_at' => $date
+                ]
+            ]);
+        }
+        return $data;
+    }
+
+    public function createCountForAllTimeSlots(string $date)
+    {
+        $data = [];
+        for ($i=0; $i < 4; $i++) { 
+            $data = array_merge($data, $this->createCount($date, $i+1));
+        }
+        return $data;
+    }
 }

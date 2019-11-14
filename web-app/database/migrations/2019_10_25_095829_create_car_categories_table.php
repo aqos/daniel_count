@@ -17,6 +17,7 @@ class CreateCarCategoriesTable extends Migration
             $table->bigIncrements('id');
             $table->string('name');
             $table->string('avatar');
+            $table->string('avatar_xs');
             $table->timestamps();
         });
     }
